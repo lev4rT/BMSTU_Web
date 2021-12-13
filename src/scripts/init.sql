@@ -1,18 +1,6 @@
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 
-DO
-$$BEGIN
-    EXECUTE (
-        SELECT 'DROP INDEX ' || string_agg(indexrelid::regclass::text, ', ')
-        FROM   pg_index  i
-                   LEFT   JOIN pg_depend d ON d.objid = i.indexrelid
-            AND d.deptype = 'i'
-        WHERE  i.indrelid = 'post'::regclass  -- possibly schema-qualified
-          AND    d.objid IS NULL                                -- no internal dependency
-    );
-END$$;
-
 CREATE EXTENSION IF NOT EXISTS citext;
 
 DROP TABLE IF EXISTS "user" CASCADE;
@@ -215,4 +203,7 @@ ANALYZE thread;
 ANALYZE post;
 ANALYZE vote;
 
--- sudo /Applications/Postgres.app/Contents/Versions/14/bin/psql -h localhost -d postgres -U postgres -p 5432 -a -q -f ./init.sql
+CREATE USER nginx_read_only LOGIN PASSWORD 'nginx';
+GRANT CONNECT ON DATABASE postgres TO nginx_read_only;
+GRANT USAGE ON SCHEMA public TO nginx_read_only;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO nginx_read_only;

@@ -13,7 +13,7 @@ consumes:
 produces:
   - application/json
 paths:
-  /forum/create:
+  /forum:
     post:
       summary: Создание форума
       description: |
@@ -39,7 +39,7 @@ paths:
         409:
           description: |
             Форум уже присутсвует в базе данных.
-  /forum/{slug}/details:
+  /forum/{slug}:
     get:
       summary: Получение информации о форуме
       description: |
@@ -64,7 +64,6 @@ paths:
             Форум отсутсвует в системе.
           schema:
             $ref: '#/definitions/Error'
-  /forum/{slug}/create:
     post:
       summary: Создание ветки
       description: |
@@ -208,7 +207,7 @@ paths:
             Кол-во записей в базе данных, включая помеченные как "удалённые".
           schema:
             $ref: '#/definitions/Status'
-  /thread/{id}/create:
+  /thread/{id}:
     post:
       summary: Создание новых постов
       description: |
@@ -246,7 +245,6 @@ paths:
             Хотя бы один родительский пост отсутсвует в текущей ветке обсуждения.
           schema:
             $ref: '#/definitions/Error'
-  /thread/{id}/details:
     get:
       summary: Получение информации о ветке обсуждения
       description: |
@@ -259,35 +257,6 @@ paths:
           description: Идентификатор ветки обсуждения.
           required: true
           type: string
-      responses:
-        200:
-          description: |
-            Информация о ветке обсуждения.
-          schema:
-            $ref: '#/definitions/Thread'
-        404:
-          description: |
-            Ветка обсуждения отсутсвует в форуме.
-          schema:
-            $ref: '#/definitions/Error'
-    post:
-      summary: Обновление ветки
-      description: |
-        Обновление ветки обсуждения на форуме.
-      operationId: threadUpdate
-      parameters:
-        - name: id
-          in: path
-          description: Идентификатор ветки обсуждения.
-          required: true
-          type: string
-          format: identity
-        - name: thread
-          in: body
-          description: Данные ветки обсуждения.
-          required: true
-          schema:
-            $ref: '#/definitions/ThreadUpdate'
       responses:
         200:
           description: |
@@ -354,7 +323,7 @@ paths:
             Ветка обсуждения отсутсвует в форуме.
           schema:
             $ref: '#/definitions/Error'
-  /user/{nickname}/create:
+  /user/{nickname}:
     post:
       summary: Создание нового пользователя
       description: |
@@ -382,7 +351,6 @@ paths:
         409:
           description: |
             Пользователь уже присутсвует в базе данных.
-  /user/{nickname}/profile:
     get:
       summary: Получение информации о пользователе
       description: |

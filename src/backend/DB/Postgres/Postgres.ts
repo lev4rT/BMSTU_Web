@@ -96,6 +96,7 @@ export class Postgres implements Database {
             }
             return [httpStatus.OK, result.rows[0]];
         } catch (e) {
+            console.log(e)
             return [httpStatus.INTERNAL_SERVER_ERROR, null];
         }
     }

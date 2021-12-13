@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
-
+import swaggerUIExpress from "swagger-ui-express";
+import swaggerJSDoc from "swagger-jsdoc";
 
 import {UserRepository} from "./Repositories/UserRepository";
 import {UserService} from "./Services/UserService";
@@ -23,12 +24,22 @@ import {createThreadRouter} from "./Routers/ThreadRouter";
 import {ThreadRepository} from "./Repositories/ThreadRepository";
 import {ThreadService} from "./Services/ThreadService";
 import {ThreadController} from "./Controllers/ThreadController";
+import options from "./options/options";
 
-
+const specs = options
 const app = express();
 app.use(bodyParser.json());
 
-const db = new Postgres('postgres', 'localhost', 'postgres', 5432, 'postgres');
+let db = null
+switch (process.argv[2]) {
+    case 'MAIN':
+        db = new Postgres('postgres', 'api-db', 'postgres', 5432, 'postgres');
+        break
+    case 'READONLY':
+        db = new Postgres('postgres', 'api-db', 'nginx', 5432, 'nginx_read_only');
+        break
+}
+
 
 const APIVersion = 'v1';
 app.use(`/api/${APIVersion}/service`, createAdminRouter(new AdminController(new AdminService(new AdminRepository(db)))));
@@ -36,8 +47,9 @@ app.use(`/api/${APIVersion}/user`, createUserRouter(new UserController(new UserS
 app.use(`/api/${APIVersion}/forum`, createForumRouter(new ForumController(new ForumService(new ForumRepository(db)))));
 app.use(`/api/${APIVersion}/thread`, createThreadRouter(new ThreadController(new ThreadService(new ThreadRepository(db)))));
 app.use(`/api/${APIVersion}/post`, createPostRouter(new PostController(new PostService(new PostRepository(db)))));
+app.use(`/api/${APIVersion}`, swaggerUIExpress.serve, swaggerUIExpress.setup(specs));
 
-const port = 8080;
+const port = process.env.PORT || process.argv[3];
 app.listen(port, () => {
     console.log(`API server listening on port: ${port}`);
 })

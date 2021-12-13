@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  api-db:
+    image: postgres
+    container_name: "api_db"
+    restart: unless-stopped
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - ./src/scripts/init.sql:/docker-entrypoint-initdb.d/init_api_db.sql
+    ports:
+      - "9432:5432"
+  api-backend:
+    build: .
+    container_name: "bmstu_web"
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+      - "8082:8082"
+      - "8083:8083"
+    depends_on:
+      - api-db
+  pgadmin:
+    container_name: "pgadmin4_container"
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
